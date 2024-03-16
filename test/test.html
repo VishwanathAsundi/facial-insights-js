@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facial Expression Monitor Test</title>
+</head>
+<body style="height: 100vh;">
+    <h1>Facial Expression Monitor Test</h1>
+
+<!-- Include facialExpressionMonitor.js directly -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.12.0/dist/tf.min.js"></script>
+<script src="../SOURCES/facialExpressionMonitor.js"></script>
+
+<script>
+  // Create instance of FacialExpressionMonitor to render the icon on every page
+  const facialExpressionMonitor = new FacialExpressionMonitor();
+  console.log(facialExpressionMonitor, 'facialExpressionMonitor');
+</script>
+
+</body>
+</html>

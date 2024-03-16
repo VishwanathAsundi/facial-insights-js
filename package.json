@@ -1,0 +1,40 @@
+{
+  "name": "facial-expression-monitor",
+  "version": "1.0.0",
+  "description": "A library for monitoring facial expressions in web applications",
+  "main": "dist/facialExpressionMonitor.js",
+  "author": "Vishwanath Asundi",
+  "scripts": {
+    "test": "jest --coverage --verbose --detectOpenHandles"
+  },
+  "keywords": [
+    "facial",
+    "expression",
+    "monitor",
+    "tensorflow",
+    "huggingface",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:VishwanathAsundi/facial-insights-js.git"
+  },
+  "publishConfig": {
+    "registry": "https://repo-art.cisco.com/artifactory/api/npm/libs-npm-local/"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.17.0",
+    "axios": "^0.21.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-google": "^0.14.0",
+    "jest": "^29.6.3",
+    "jest-sonar-reporter": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=14 <20",
+    "npm": ">=6"
+  }
+}
