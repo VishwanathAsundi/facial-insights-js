@@ -1,11 +1,15 @@
 // Import TensorFlow.js
 import * as tf from '@tensorflow/tfjs';
+import { HfInference } from '@huggingface/inference'
+
+const hf = new HfInference('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');
 
 // Define the library class
 export default class FacialExpressionMonitor {
     constructor() {
         // Initialize video stream
         this.video = document.createElement('video');
+        this.video.id='video-stream';
         this.video.width = 640; // Adjust these dimensions as needed
         this.video.height = 480; // Adjust these dimensions as needed
         this.video.autoplay = true;
@@ -14,37 +18,41 @@ export default class FacialExpressionMonitor {
 
         // Initialize camera control popup
         this.initCameraControl();
-
-        // Load your pre-trained model (replace with Hugging Face model if available)
-        this.loadModel();
     }
 
-    async loadModel() {
-        // Load the Hugging Face AI model
-        this.model = await tf.loadGraphModel('https://huggingface.co/dima806/facial_emotions_image_detection/resolve/main/model.json');
-    }
-
-    processVideoStream() {
+    async processVideoStream() {
+        // Wait for the video metadata to load
+        await new Promise(resolve => {
+            this.video.addEventListener('loadedmetadata', resolve);
+        });
+    
         // Process the video stream for facial expressions
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
+        console.log(this.video, 'this.video');
         canvas.width = this.video.videoWidth;
         canvas.height = this.video.videoHeight;
         context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const tensor = tf.browser.fromPixels(imageData).toFloat().expandDims(0).div(255);
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const pngImageData = await fetch(pngDataUrl).then(response => response.blob());
 
-        const predictions = this.model.predict(tensor);
-        console.log(predictions);
+        // Perform inference using Hugging Face Inference API
+        const predictions = await hf.imageClassification({
+            data: pngImageData,
+            model: 'dima806/facial_emotions_image_detection'
+        });
+        console.log(predictions, '==predictions here==');
+        return predictions;
     }
 
     initCameraControl() {
         // Create icon for camera control
         const icon = document.createElement('img');
         icon.id = 'cameraIcon';
-        icon.src = '../public/images/icon1.png'; // Path to your icon image
+        icon.src = 'https://cdn-icons-png.flaticon.com/512/3570/3570159.png';
         icon.style.position = 'fixed';
+        icon.style.zIndex=999;
         icon.style.bottom = '20px';
         icon.style.right = '20px';
         icon.style.width = '50px';
@@ -105,6 +113,7 @@ export default class FacialExpressionMonitor {
         // Prompt the user for camera access
         navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
+            console.log(stream, 'stream');
             // Show video stream
             this.video.srcObject = stream;
             this.video.style.width = '150px';
@@ -112,11 +121,37 @@ export default class FacialExpressionMonitor {
             this.video.style.position = 'fixed';
             this.video.style.top = '0px';
             this.video.style.right = '0px';
-            this.video.style.zIndex = '9999'; // Ensure video appears on top of other elements
+            this.video.style.zIndex = 9999; // Ensure video appears on top of other elements
             this.video.style.display = 'block'; // Display the video stream
 
-            // Call processVideoStream method when video stream starts
-            this.processVideoStream();
+            this.predictedExpression.position='fixed';
+            this.predictedExpression.top='500px';
+            this.predictedExpression.style.right = '30px';
+
+            document.body.appendChild(this.video);
+            document.body.appendChild(this.predictedExpression);
+
+            console.log(this.video, 'this.video here');
+            
+            // Start processing the video stream recursively with a delay of 1 second
+            const processVideoRecursive = () => {
+                this.processVideoStream()
+                    .then((result) => {
+                        console.log(result, 'result here');
+                        this.predictedExpression.innerHTML = result[0].label;
+                        this.predictedExpression.style.display = 'block';
+                        
+                        // Schedule the next invocation after a delay of 1 second
+                        setTimeout(processVideoRecursive, 1000);
+                    })
+                    .catch((error) => {
+                        console.error('Error processing video stream:', error);
+                        this.predictedExpression.style.display = 'none';
+                    });
+            };
+
+            // Start the recursive processing of the video stream
+            processVideoRecursive();
         })
         .catch((error) => {
             console.error('Error accessing camera:', error);
@@ -132,6 +167,7 @@ export default class FacialExpressionMonitor {
 
         // Hide the video element
         this.video.style.display = 'none';
+        clearInterval(this.processingInterval);
     }
 
     openCameraControlPopup() {
