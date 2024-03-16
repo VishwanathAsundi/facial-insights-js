@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+target/
+.config/
+.npm/
+SOURCES/testService.js
