@@ -2,7 +2,7 @@
 import * as tf from '@tensorflow/tfjs';
 import { HfInference } from '@huggingface/inference'
 
-const hf = new HfInference('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');
+const hf = new HfInference('');
 
 // Define the library class
 export default class FacialExpressionMonitor {
