@@ -2,7 +2,7 @@
   "name": "facial-expression-monitor",
   "version": "1.0.0",
   "description": "A library for monitoring facial expressions in web applications",
-  "main": "dist/facialExpressionMonitor.js",
+  "main": "src/facialExpressionMonitor.js",
   "author": "Vishwanath Asundi",
   "scripts": {
     "test": "jest --coverage --verbose --detectOpenHandles"
@@ -24,6 +24,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "@huggingface/inference": "^2.6.6",
     "@tensorflow/tfjs": "^4.17.0",
     "axios": "^0.21.1"
   },
